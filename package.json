@@ -1,0 +1,1 @@
+{"name":"pabna-haunting","version":"1.0.0","description":"Full-stack haunted terminal game","main":"server.js","scripts":{"start":"node server.js"},"engines":{"node":">=18"}}
