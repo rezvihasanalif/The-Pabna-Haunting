@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Archive – Pabna Haunting</title><link rel="stylesheet" href="style.css"></head>
+<body data-page="archive" data-guard><nav id="nav"></nav>
+<main><h1 data-i="a_title"></h1><p data-i="a_intro"></p>
+<input id="q" type="search" data-p="a_search" aria-label="search"><div id="logs"></div>
+<h2 style="margin-top:2.5rem" data-i="w_title"></h2><p data-i="w_intro"></p><p class="ok" id="wm"></p>
+<svg id="wires" viewBox="0 0 400 240" role="img" aria-label="telegraph wires"></svg></main>
+<script src="app.js"></script>
+<script>
+/* Patient logs. cipher.a = answer. Answers are checked on the server. */
+const LOGS=[
+ {id:1,name:"Patient 017 · Rahela",text:"Refuses to sleep. Says the river hums at 3 a.m."},
+ {id:2,name:"Patient 042 · The Bridge Keeper",text:"Drew a steel bridge over the water, again and again. Wrote its name but shifted every letter three steps forward.",c:"KDUGLQJH",h:"Caesar shift: move each letter 3 back."},
+ {id:3,name:"Patient 051 · Nurse Shefali",text:"Heard footsteps in the Nilkuthi ward after lights out."},
+ {id:4,name:"Patient 066 · The Imam's Son",text:"Whispers a name of a mosque in numbers only: A=1, B=2, C=3.",c:"20 1 18 1 19 8",h:"A=1 ... Z=26. The old mosque starts with Tarash."},
+ {id:5,name:"Patient 073 · Unknown",text:"Found at the riverbank. Never spoke. Never blinked."}];
+const logs=document.getElementById("logs"),q=document.getElementById("q");
+function draw(){const s=(S.get().solved||[]),k=q.value.trim().toLowerCase(),L=LOGS.filter(l=>(l.name+l.text).toLowerCase().includes(k));
+ logs.innerHTML=L.length?L.map(l=>`<div class="log ${s.includes(l.id)?"solved":""}"><h3>${l.name}</h3><p>${l.text}</p>${l.c?`<div class="cipher">${l.c}</div><p class="dim mono">${l.h}</p>
+ <div class="row"><input id="a${l.id}" placeholder="${T("a_ans")}" ${s.includes(l.id)?"disabled value='✔'":""}><button data-id="${l.id}">${T("a_chk")}</button></div><div class="err" id="m${l.id}"></div>`:""}</div>`).join(""):`<p class="err">${T("a_none")}</p>`}
+logs.addEventListener("click",async e=>{const b=e.target.closest("button[data-id]");if(!b)return;const l=LOGS.find(x=>x.id==b.dataset.id),v=document.getElementById("a"+l.id).value.trim(),m=document.getElementById("m"+l.id);
+ const r=await api("cipher",{id:l.id,answer:v});
+ if(r.ok){S.set({solved:[...(S.get().solved||[]),l.id]});A.sfx("ok");draw()}else{m.textContent=T("a_wrong");A.sfx("bad")}});
+q.oninput=draw;document.addEventListener("langchange",draw);document.addEventListener("DOMContentLoaded",draw);
+/* Canvas-style SVG mini-game: reconnect telegraph wires. Click a left node, then the same colour on the right. */
+const COL=["#d32f1f","#7fae8a","#e0b341","#5b8def"],R=[...COL.keys()].sort(()=>Math.random()-.5),svg=document.getElementById("wires"),NS="http://www.w3.org/2000/svg";
+let pick=null,done=0;const links=[];
+function node(x,y,c,side,i){const n=document.createElementNS(NS,"circle");n.setAttribute("cx",x);n.setAttribute("cy",y);n.setAttribute("r",14);n.setAttribute("fill",c);n.style.cursor="pointer";n.dataset.side=side;n.dataset.c=i;svg.appendChild(n);return n}
+COL.forEach((c,i)=>node(40,35+i*55,c,"L",i));R.forEach((ci,i)=>node(360,35+i*55,COL[ci],"R",ci));
+if(S.get().wires){wmsg()}
+function wmsg(){document.getElementById("wm").textContent=T("w_done")}
+svg.addEventListener("click",e=>{const n=e.target;if(n.tagName!=="circle"||S.get().wires)return;
+ if(n.dataset.side==="L"){pick=n;A.sfx("click");return}
+ if(!pick)return;if(pick.dataset.c===n.dataset.c){const l=document.createElementNS(NS,"line");
+  l.setAttribute("x1",pick.getAttribute("cx"));l.setAttribute("y1",pick.getAttribute("cy"));l.setAttribute("x2",n.getAttribute("cx"));l.setAttribute("y2",n.getAttribute("cy"));
+  l.setAttribute("stroke",pick.getAttribute("fill"));l.setAttribute("stroke-width",4);svg.insertBefore(l,svg.firstChild);A.sfx("ok");
+  if(++done===4){api("wires",{}).then(()=>{S.set({wires:true});wmsg()})}}else A.sfx("bad");pick=null});
+document.addEventListener("langchange",()=>S.get().wires&&wmsg());
+</script></body></html>

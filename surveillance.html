@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CCTV Grid – Pabna Haunting</title><link rel="stylesheet" href="style.css"></head>
+<body data-page="surveillance" data-guard><nav id="nav"></nav>
+<main><h1 data-i="c_title"></h1><p data-i="c_intro"></p>
+<div class="bar"><button data-f="invert" data-i="f_inv"></button><button data-f="blur" data-i="f_blur"></button><button data-f="nv" data-i="f_nv"></button><button data-f="hot" data-i="f_hot"></button><button data-f="" data-i="f_clr"></button></div>
+<p class="mono"><span data-i="c_dig"></span><span id="dg"></span></p><div class="grid" id="grid"></div></main>
+<script src="app.js"></script>
+<script>
+/* Camera layout only. Clues/digits are fetched from the server (GET /api/cam) when a feed is clicked. */
+const CAMS=[
+ {n:"CAM 01 · Ward A",g:"linear-gradient(160deg,#1c2a1c,#050805)"},
+ {n:"CAM 02 · Lantern corridor",g:"linear-gradient(200deg,#2a2418,#050505)"},
+ {n:"CAM 03 · Morgue",g:"linear-gradient(120deg,#182a2a,#030606)"},
+ {n:"CAM 04 · Riverside gate",g:"linear-gradient(180deg,#1a1a2e,#040408)"},
+ {n:"CAM 05 · Chapel",g:"linear-gradient(140deg,#2a1818,#080404)"},
+ {n:"CAM 06 · Director's office",g:"linear-gradient(190deg,#222,#050505)"}];
+const grid=document.getElementById("grid");
+grid.innerHTML=CAMS.map((c,i)=>`<div class="cam" tabindex="0" role="button" data-i="${i}" style="--g:${c.g}"><div class="bg"></div><div class="noise"></div><div class="shape"></div>
+<span class="lab">${c.n}</span><span class="rec">● REC</span><div class="clue"></div></div>`).join("");
+function render(){const f=S.get().found||{},L=S.get().lang||"en";
+ grid.querySelectorAll(".cam").forEach(el=>{const c=f[el.dataset.i];el.classList.toggle("found",!!c);if(c)el.querySelector(".clue").textContent=c[L]});
+ document.getElementById("dg").textContent=[0,1,2,3].map(i=>f[i]&&f[i].d?f[i].d:"_").join(" ")}
+function glitch(el){el.classList.remove("glitch");void el.offsetWidth;el.classList.add("glitch");A.sfx("glitch")}
+async function trigger(el){const i=+el.dataset.i;glitch(el);A.sfx("whisper");const r=await api("cam?i="+i);
+ if(r.ok){S.set({found:{...(S.get().found||{}),[i]:r.clue}});render()}}
+grid.addEventListener("click",e=>{const c=e.target.closest(".cam");c&&trigger(c)});
+grid.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();const c=e.target.closest(".cam");c&&trigger(c)}});
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{grid.className="grid"+(b.dataset.f?" "+b.dataset.f:"")});
+setInterval(()=>glitch(grid.children[Math.floor(Math.random()*CAMS.length)]),5000);/* random ambient glitches */
+document.addEventListener("langchange",render);document.addEventListener("DOMContentLoaded",render);
+</script></body></html>

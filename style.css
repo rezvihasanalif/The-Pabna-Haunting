@@ -1,0 +1,55 @@
+/* Pabna Haunting – LIGHT theme. Palette: parchment #f3efe4, rust #8f1d14, blood #b3261a, ink #2a2622, moss #2f6b43 */
+:root{--ink:#f3efe4;--panel:#fffaf0;--rust:#8f1d14;--blood:#b3261a;--bone:#2a2622;--sick:#2f6b43;--dim:#6b665a}
+*{box-sizing:border-box;margin:0}
+body{background:var(--ink);color:var(--bone);font:17px/1.65 Georgia,"Noto Serif Bengali","Kalpurush",serif;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;background:repeating-linear-gradient(0deg,rgba(0,0,0,.04) 0 1px,transparent 1px 3px);animation:flick 6s infinite}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:49;background:radial-gradient(ellipse at center,transparent 60%,rgba(120,90,50,.18) 100%)}
+@keyframes flick{0%,94%,100%{opacity:1}95%{opacity:.6}97%{opacity:.9}}
+h1,h2{font-weight:normal;letter-spacing:.02em}
+h1{font-size:clamp(2rem,6vw,4rem);color:var(--blood);text-shadow:none}
+h2{font-size:1.5rem;color:var(--bone);margin-bottom:.6rem}
+.mono,input,button,.term{font-family:"Courier New",monospace}
+nav{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:center;padding:.8rem 1.2rem;border-bottom:1px solid var(--rust);background:#e9e3d2;position:sticky;top:0;z-index:40}
+nav a{color:var(--dim);text-decoration:none}nav a:hover,nav a.on{color:var(--blood)}
+nav .sp{flex:1}
+button{background:transparent;color:var(--bone);border:1px solid var(--rust);padding:.45rem .9rem;cursor:pointer;font-size:.95rem}
+button:hover,button:focus-visible{background:var(--rust);color:#fff;outline:none}
+input{background:#fff;color:var(--bone);border:1px solid var(--dim);padding:.55rem .7rem;font-size:1rem;width:100%}
+input:focus{outline:2px solid var(--blood)}
+main{max-width:1000px;margin:0 auto;padding:2rem 1.2rem 4rem}
+.warn{border-left:4px solid var(--blood);padding:.6rem 1rem;background:rgba(143,29,20,.15);margin:1.2rem 0}
+.term{background:#fffaf0;border:1px solid var(--sick);color:var(--sick);padding:1.2rem;margin-top:1.5rem;box-shadow:0 2px 14px rgba(47,107,67,.15)}
+.term p{margin-bottom:.6rem}.err{color:var(--blood);min-height:1.5em}.ok{color:var(--sick)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:1rem}
+.cam{position:relative;aspect-ratio:4/3;background:#0b0f0b;border:1px solid #243024;overflow:hidden;cursor:pointer;transition:filter .3s}
+.cam .bg{position:absolute;inset:0;background:var(--g);opacity:.8}
+.cam .noise{position:absolute;inset:-50%;background:repeating-radial-gradient(circle at 30% 40%,rgba(255,255,255,.07) 0 1px,transparent 1px 3px);animation:nz .25s steps(3) infinite}
+@keyframes nz{to{transform:translate(8%,6%)}}
+.cam .lab{position:absolute;left:8px;top:6px;font:12px "Courier New",monospace;color:#e5e5e5;text-shadow:0 0 3px #000}
+.cam .rec{position:absolute;right:8px;top:6px;color:#ff5a4a;font:12px monospace;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:0}}
+.cam .shape{position:absolute;bottom:0;left:40%;width:18%;height:55%;background:#000;border-radius:50% 50% 0 0;opacity:0;transition:opacity .2s}
+.cam.glitch{animation:gl .4s steps(2)}.cam.glitch .shape{opacity:.85}
+@keyframes gl{0%{transform:translate(-4px,2px) skewX(6deg);filter:hue-rotate(90deg)}50%{transform:translate(5px,-2px);filter:invert(1)}100%{transform:none}}
+.cam .clue{position:absolute;inset:auto 0 0 0;background:rgba(0,0,0,.75);color:#9fd4aa;font:13px "Courier New",monospace;padding:6px 8px;display:none}
+.cam.found .clue{display:block}
+.grid.invert .cam{filter:invert(1)}.grid.blur .cam{filter:blur(2px)}.grid.nv .cam{filter:grayscale(1) sepia(1) hue-rotate(60deg) saturate(4) brightness(1.1)}.grid.hot .cam{filter:hue-rotate(160deg) saturate(3) contrast(1.3)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:1rem 0}
+.log{border:1px solid #cfc7b0;background:var(--panel);padding:1rem;margin-top:.8rem}
+.log h3{font-weight:normal;color:var(--blood)}.log .cipher{font-family:"Courier New",monospace;color:var(--sick);letter-spacing:.12em;margin:.4rem 0}
+.row{display:flex;gap:8px;margin-top:.5rem}.row input{flex:1}
+.solved{border-color:var(--sick)}
+#wires{width:100%;max-width:420px;background:#fffaf0;border:1px solid var(--dim);display:block;margin-top:.6rem}
+#timer{font:clamp(3rem,12vw,7rem) "Courier New",monospace;color:var(--blood);text-align:center;text-shadow:none}
+#timer.low{animation:blink .5s infinite}
+.fields{display:grid;gap:.8rem;max-width:520px;margin:1rem auto}
+.overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:2rem}
+.overlay.show{display:flex}
+#lose{background:#000;color:var(--blood);animation:shake .1s infinite}
+#lose .face{font-size:min(60vw,60vh);line-height:1}
+#win{background:#f3efe4;color:var(--sick)}
+@keyframes shake{25%{transform:translate(8px,-6px)}50%{transform:translate(-8px,6px)}75%{transform:translate(6px,8px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@media(max-width:600px){body{font-size:16px}.row{flex-direction:column}}
+
+#lose h1{color:#ff3b2a}

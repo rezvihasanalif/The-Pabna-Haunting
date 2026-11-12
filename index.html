@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Pabna Haunting</title><link rel="stylesheet" href="style.css"></head>
+<body data-page="index"><nav id="nav"></nav>
+<main><h1 data-i="h_title"></h1>
+<div class="warn" data-i="h_warn"></div><p data-i="h_lore"></p>
+<form class="term" id="f" novalidate><p data-i="h_login"></p><p class="dim" data-i="h_hint"></p>
+<label for="pw" data-i="h_pass"></label><input id="pw" type="password" autocomplete="off" data-p="h_pass">
+<div class="err" id="msg" role="alert"></div><button type="submit" data-i="h_go"></button></form></main>
+<script src="app.js"></script>
+<script>
+/* Login is verified by the server (POST /api/login). The passcode is not stored in this file. */
+let tries=0;
+document.getElementById("f").addEventListener("submit",async e=>{e.preventDefault();
+ const v=document.getElementById("pw").value.trim(),m=document.getElementById("msg");m.className="err";
+ if(!v){m.textContent=T("h_empty");return}
+ const r=await api("login",{passcode:v});
+ if(r.ok){S.set({auth:true,token:r.token,found:{},solved:[]});m.className="ok";m.textContent=T("h_okk");A.sfx("ok");setTimeout(()=>location.href="surveillance.html",1100)}
+ else{tries++;m.textContent=r.error||(T("h_bad")+tries);A.sfx("bad");document.body.animate([{filter:"invert(1)"},{filter:"none"}],200)}});
+</script></body></html>

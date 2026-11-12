@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escape – Pabna Haunting</title><link rel="stylesheet" href="style.css"></head>
+<body data-page="escape" data-guard><nav id="nav"></nav>
+<main><h1 data-i="e_title"></h1><p data-i="e_intro"></p><div id="timer">--:--</div>
+<form class="fields" id="f" novalidate>
+<label for="w1" data-i="e_w1"></label><input id="w1" autocomplete="off">
+<label for="w2" data-i="e_w2"></label><input id="w2" autocomplete="off">
+<label for="w3" data-i="e_w3"></label><input id="w3" inputmode="numeric" maxlength="4" autocomplete="off">
+<div class="err" id="msg" role="alert"></div><button type="submit" data-i="e_go"></button></form></main>
+<div class="overlay" id="win"><h1 data-i="e_win" style="color:var(--sick)"></h1><p data-i="e_winp"></p><p class="mono" id="secs"></p>
+<div class="row" id="nm" style="max-width:360px"><input id="name" maxlength="20" placeholder="Your name"><button id="save">Save score</button></div>
+<ol class="mono" id="lb" style="text-align:left;margin:1rem 0"></ol><button onclick="S.clear();location.href='index.html'" data-i="e_again"></button></div>
+<div class="overlay" id="lose"><div class="face">👁</div><h1 data-i="e_lose"></h1><button onclick="S.clear();location.href='index.html'" data-i="e_again"></button></div>
+<script src="app.js"></script>
+<script>
+/* The server owns the timer, penalties, bonus and answers. The client only displays the countdown. */
+const tm=document.getElementById("timer");let deadline=0,end=false;
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+async function board(){const r=await api("leaderboard");document.getElementById("lb").innerHTML=(r.rows||[]).map(x=>`<li>${x.name} - ${fmt(x.seconds)}</li>`).join("")}
+function finish(win,secs){if(end)return;end=true;document.getElementById(win?"win":"lose").classList.add("show");A.sfx(win?"ok":"scare");
+ if(win){document.getElementById("secs").textContent="Time: "+fmt(secs);board()}else navigator.vibrate&&navigator.vibrate([200,100,400])}
+function tick(){if(end||!deadline)return;const left=Math.max(0,deadline-Date.now()),s=Math.ceil(left/1000);tm.textContent=fmt(s);tm.classList.toggle("low",s<=30);if(left<=0)finish(false)}
+(async()=>{const r=await api("start");if(!r.ok){S.clear();location.href="index.html";return}deadline=Date.now()+r.remaining;setInterval(tick,250);tick()})();
+document.getElementById("f").addEventListener("submit",async e=>{e.preventDefault();if(end)return;
+ const a=["w1","w2","w3"].map(i=>document.getElementById(i).value.trim()),m=document.getElementById("msg");
+ if(a.some(x=>!x)){m.textContent=T("e_fill");return}
+ if(!/^\d{4}$/.test(a[2])){m.textContent=T("e_dig");return}
+ const r=await api("escape",{w1:a[0],w2:a[1],w3:a[2]});
+ if(r.won)finish(true,r.seconds);else if(r.expired)finish(false);
+ else{deadline=Date.now()+r.remaining;m.textContent=T("e_bad");A.sfx("bad");tick()}});
+document.getElementById("save").onclick=async()=>{await api("score",{name:document.getElementById("name").value});document.getElementById("nm").style.display="none";board()};
+</script></body></html>
